@@ -1,7 +1,44 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, effect } from 'vue';
 
 const showModal = ref(false);
+const notes = ref([]);
+const noteContent = ref('');
+const error = ref(false);
+
+effect(() => {
+  if (!(noteContent.value.length === 0 || noteContent.value.length > 160))
+    error.value = false;
+
+  // console.log('------------>', noteContent.value);
+}, noteContent);
+
+const getRandomColor = () => {
+  return 'hsl(' + Math.random() * 360 + ', 100%, 75%)';
+};
+
+const noteContentIsValid = () => {
+  return noteContent.value.length === 0 || noteContent.value.length > 160;
+};
+
+const addNote = () => {
+  if (noteContentIsValid()) {
+    error.value = true;
+    return;
+  }
+
+  const lastNote = notes.value[notes.value.length - 1];
+
+  notes.value.push({
+    id: lastNote?.id + 1 || 1,
+    text: noteContent.value,
+    date: new Date(),
+    backgroundColor: getRandomColor()
+  });
+
+  showModal.value = false;
+  noteContent.value = '';
+};
 
 const toggleModal = () => {
   showModal.value = !showModal.value;
@@ -12,8 +49,15 @@ const toggleModal = () => {
   <main>
     <div v-show="showModal" class="overlay">
       <div class="modal">
-        <textarea name="note" id="note" cols="30" rows="10"></textarea>
-        <button>Add Note</button>
+        <textarea
+          v-model="noteContent"
+          name="note"
+          id="note"
+          cols="30"
+          rows="10"
+          :style="error && { border: '2px solid #c10f0f' }"
+        ></textarea>
+        <button @click="addNote()">Add Note</button>
         <button class="close" @click="toggleModal()">Close</button>
       </div>
     </div>
@@ -25,13 +69,16 @@ const toggleModal = () => {
       </header>
 
       <div class="cards-container">
-        <div class="card">
+        <div
+          v-for="note in notes"
+          :key="note.id"
+          class="card"
+          :style="{ backgroundColor: note.backgroundColor }"
+        >
           <p class="main-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut lacus
-            lorem. Nulla ultrices ligula sed neque porttitor faucibus. Nam
-            pellentesque turpis sit amet tortor fermentum lacinia.
+            {{ note.text }}
           </p>
-          <p class="date">29/04/2023</p>
+          <p class="date">{{ note.date.toLocaleDateString('en-US') }}</p>
         </div>
       </div>
     </div>
@@ -68,7 +115,7 @@ header button {
   width: 50px;
   height: 50px;
   cursor: pointer;
-  background-color: rgb(21, 20, 20);
+  background-color: #151414;
   border-radius: 100%;
   color: white;
   font-size: 24px;
@@ -77,7 +124,7 @@ header button {
 .card {
   width: 225px;
   height: 225px;
-  background-color: rgb(237, 182, 44);
+  background-color: #edb62c;
   border-radius: 15px;
   padding: 10px;
   display: flex;
@@ -87,9 +134,13 @@ header button {
   margin-bottom: 20px;
 }
 
+.card .main-text {
+  font-weight: bold;
+}
+
 .date {
   font-size: 12.5px;
-  font-weight: bold;
+  font-style: italic;
 }
 
 .cards-container {
@@ -101,7 +152,7 @@ header button {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.77);
+  background-color: #000000c4;
   z-index: 7;
   display: flex;
   align-items: center;
@@ -110,7 +161,7 @@ header button {
 
 .modal {
   width: 750px;
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 10px;
   padding: 30px;
   position: relative;
@@ -118,11 +169,16 @@ header button {
   flex-direction: column;
 }
 
+.modal textarea {
+  border-radius: 5px;
+  resize: none;
+}
+
 .modal button {
   padding: 10px 20px;
   font-size: 20px;
   width: 100%;
-  background-color: blueviolet;
+  background-color: #8a2be2;
   border: none;
   color: white;
   cursor: pointer;
@@ -130,7 +186,7 @@ header button {
 }
 
 .modal .close {
-  background-color: rgb(193, 15, 15);
+  background-color: #c10f0f;
   margin-top: 7px;
 }
 </style>
