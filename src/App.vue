@@ -1,15 +1,37 @@
+<script setup>
+import { ref } from 'vue';
+
+const showModal = ref(false);
+
+const toggleModal = () => {
+  showModal.value = !showModal.value;
+};
+</script>
+
 <template>
   <main>
+    <div v-show="showModal" class="overlay">
+      <div class="modal">
+        <textarea name="note" id="note" cols="30" rows="10"></textarea>
+        <button>Add Note</button>
+        <button class="close" @click="toggleModal()">Close</button>
+      </div>
+    </div>
+
     <div class="container">
       <header>
         <h1>Notes</h1>
-        <button>+</button>
+        <button @click="toggleModal()">+</button>
       </header>
 
       <div class="cards-container">
         <div class="card">
-          <p class="main-text"></p>
-          <p class="date"></p>
+          <p class="main-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut lacus
+            lorem. Nulla ultrices ligula sed neque porttitor faucibus. Nam
+            pellentesque turpis sit amet tortor fermentum lacinia.
+          </p>
+          <p class="date">29/04/2023</p>
         </div>
       </div>
     </div>
@@ -34,13 +56,13 @@ header {
   align-items: center;
 }
 
-h1 {
+header h1 {
   font-size: 75px;
   font-weight: bold;
   margin-bottom: 25px;
 }
 
-button {
+header button {
   border: none;
   padding: 10px;
   width: 50px;
@@ -73,5 +95,42 @@ button {
 .cards-container {
   display: flex;
   flex-wrap: wrap;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.77);
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  width: 750px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal button {
+  padding: 10px 20px;
+  font-size: 20px;
+  width: 100%;
+  background-color: blueviolet;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.modal .close {
+  background-color: rgb(193, 15, 15);
+  margin-top: 7px;
 }
 </style>
